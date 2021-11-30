@@ -1,114 +1,93 @@
-function calcu() {
-    const proverka = /^-+\d+$|\d+$/;
-    let x = document.getElementById("prodPrice").innerHTML;
-    const re = /[0-9/.]+/;
-    let first = x.match(re);
-    console.log();
-    let b = document.getElementsByName("number");
-    if (proverka.test(first) == false|| proverka.test(b[0].value) == false) {
-        alert("Вы сделали что-то не так!");
+window.addEventListener('DOMContentLoaded', function (event) {
+    console.log("DOM fully loaded and parsed");
+    document.getElementById("typ").addEventListener("click", hid);
+    document.getElementById("county").addEventListener("change", calculate2);
+    document.getElementById("typ").addEventListener("change", calculate2);
+    document.getElementById("r1").addEventListener("change", calculate2);
+    document.getElementById("r2").addEventListener("change", calculate2);
+    document.getElementById("chk1").addEventListener("change", calculate2);
+    document.getElementById("chk2").addEventListener("change", calculate2);
+});
+
+
+function hid() {
+    let type;
+    type = document.getElementById('typ').value;
+    switch (type) {
+        case'1':
+            document.getElementById("radio").hidden = true;
+            document.getElementById("checkbox").hidden = true;
+            break;
+        case'2':
+            document.getElementById("radio").hidden = false;
+            document.getElementById("checkbox").hidden = true;
+            break;
+        case'3':
+            document.getElementById("radio").hidden = true;
+            document.getElementById("checkbox").hidden = false;
+            break;
+    }
+}
+
+function calculate2() {
+    let type, count, checkbox, radio, res;
+    var rate, chec = 0;
+    type = document.getElementById('typ').value;
+    count = document.getElementById('county').value;
+    checkbox = document.getElementsByName('checkbox');
+    radio = document.getElementsByName('radio');
+    count = parseInt(count);
+
+    if (!(Number.isInteger(type) && Number.isInteger(count)) && !(count > 0 && count < 10000)) {
     } else {
-        let c = document.getElementById("result");
-        first[0] = Number.parseInt(first[0]);
-        b[0] = Number.parseInt(b[0]);
-        var res = first * b[0].value;
-        c.innerHTML = "Итого: " + Math.abs(res);
-        return false;
-    }
-}
-
-function getPrices() {
-    return {
-        prodTypes: [1500, 590, 480],
-        prodOptions: {
-            option1: 1000,
-            option2: 2000,
-            option3: 3000,
-        },
-        prodProperties: {
-            prop1: 4000,
-            prop2: 5000,
-            prop3: 6000,
-        }
-    };
-}
-function updatePrice() {
-    let s = document.getElementsByName("prodType");
-    let select = s[0];
-    let price = 0;
-    let prices = getPrices();
-    let priceIndex = parseInt(select.value);
-    price = prices.prodTypes[priceIndex];
-
-    let radioDiv = document.getElementById("radios");
-    if( select.value == "1") {
-        radioDiv.style.display = "block";
-    }
-    else
-        radioDiv.style.display = "none";
-    let radios = document.getElementsByName("prodOptions");
-    radios.forEach(function(radio) {
-        if (radio.checked) {
-            let optionPrice = prices.prodOptions[radio.value];
-            if (optionPrice !== undefined) {
-                price += optionPrice;
+        for (var i = 0; i < radio.length; i++) {
+            if (radio[i].checked) {
+                rate = radio[i].value;
             }
         }
-    });
-    let checkboxes = document.querySelectorAll("#checkboxes input");
-    checkboxes.forEach(function(checkbox) {
-        if (checkbox.checked) {
-            let propPrice = prices.prodProperties[checkbox.name];
-            price += propPrice;
+        for (var i = 0; i < checkbox.length; i++) {
+            if (checkbox[i].checked) {
+                chec += checkbox[i].value;
+            }
         }
-    });
-    let checkDiv = document.getElementById("checkboxes");
-    if (select.value == "2") {
-        checkDiv.style.display = "block";
+        switch (type) {
+            case '1':
+                res = count * 1490;
+                break;
+            case '2':
+                if (rate == 1) {
+                    res = count * 590;
+                }
+                if (rate == 2) {
+                    res = count * 990;
+                }
+                break;
+            case '3':
+                if (chec == 0) {
+                    res = count * 1490;
+                }
+                if (chec == 1) {
+                    res = count * 780;
+                }
+                if (chec == 2) {
+                    res = count * 3190;
+                }
+                if (chec == 12) {
+                    res = count * (3190 + 780);
+                }
+                break;
+        }
+        document.getElementById('produce').innerHTML = "Стоимость: " + res + " руб.";
     }
-    else
-        checkDiv.style.display = "none";
-    let prodPrice = document.getElementById("prodPrice");
-    if (select.value == "0") {
-        price = 1500;
-    }
-    prodPrice.innerHTML = price + " рублей";
+
+    console.log("type");
+    console.log(type);
+    console.log("count");
+    console.log(count);
+    console.log("radio");
+    console.log(rate);
+    console.log("checkbox");
+    console.log(chec);
+    console.log("result");
+    console.log("produce");
 }
-
-
-
-window.addEventListener('DOMContentLoaded', function (event) {
-
-    let button = document.getElementById("butt");
-    button.addEventListener("Click",calcu);
-
-    let radioDiv = document.getElementById("radios");
-    radioDiv.style.display = "none";
-
-    let s = document.getElementsByName("prodType");
-    let select = s[0];
-
-    select.addEventListener("change", function(event) {
-        let target = event.target;
-        updatePrice();
-    });
-
-    let radios = document.getElementsByName("prodOptions");
-    radios.forEach(function(radio) {
-        radio.addEventListener("change", function(event) {
-            let r = event.target;
-            updatePrice();
-        });
-    });
-
-    let checkboxes = document.querySelectorAll("#checkboxes input");
-    checkboxes.forEach(function(checkbox) {
-        checkbox.addEventListener("change", function(event) {
-            let c = event.target;
-            updatePrice();
-        });
-    });
-
-
-    updatePrice();
-});
